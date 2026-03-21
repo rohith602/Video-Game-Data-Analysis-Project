@@ -50,7 +50,7 @@ def analyze():
     plt.figure(figsize=(10,6)); plt.hist(df['Year'].dropna(), bins=20, color='#f59e0b', edgecolor='#222222', alpha=0.85); f('histogram_plot', 'Distribution of Games by Release Year (Histogram)', 'Release Year', 'Number of Games')
     
     # 7. Scatter Plot (NA vs EU Sales Correlation)
-    plt.figure(figsize=(10,6)); sc = plt.scatter(df['NA_Sales'], df['EU_Sales'], c=df['Global_Sales'], cmap='cool', s=40, alpha=0.5, edgecolors='none'); plt.xscale('symlog', linthresh=0.01); plt.yscale('symlog', linthresh=0.01); plt.colorbar(sc, label='Global Sales (M)'); f('scatter_plot', 'NA vs EU Sales Correlation (SymLog Scale Scatter)', 'NA Sales (Millions)', 'EU Sales (Millions)')
+    plt.figure(figsize=(10,6)); sc = plt.scatter(df['NA_Sales'], df['EU_Sales'], c=df['Global_Sales'], s=df['Global_Sales']*12 + 10, cmap='cool', alpha=0.6, edgecolors='#ffffff', linewidths=0.5); plt.plot([0, 45], [0, 45], color='#ffffff', ls='--', lw=1.5, alpha=0.5, zorder=0); plt.colorbar(sc, label='Global Sales (M)'); f('scatter_plot', 'NA vs EU Sales Correlation (Scatter Plot)', 'NA Sales (Millions)', 'EU Sales (Millions)')
     
     # 8. Box Plot (Sales Distribution for Top Genres)
     plt.figure(figsize=(10,6)); plt.boxplot([df[df['Genre']==g]['Global_Sales'].dropna() for g in t5], patch_artist=True, showfliers=True, flierprops=dict(marker='o', markerfacecolor='#ef4444', markersize=4, alpha=0.5, markeredgewidth=0), boxprops=dict(facecolor='#8b5cf6', color='#cbd5e1'), whiskerprops=dict(color='#cbd5e1', lw=1.5), capprops=dict(color='#cbd5e1', lw=1.5), medianprops=dict(color='#fcd34d', lw=2)); plt.yscale('log'); plt.xticks(range(1, len(t5)+1), t5); f('box_plot', 'Sales Distribution for Top Genres (Log-Scale Box Plot)', 'Genre', 'Log Global Sales (Millions)', 'y')
