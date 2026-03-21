@@ -1,176 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Analysis Dashboard</title>
-    <style>
-        /* --- DESIGN SYSTEM (OLED THEME) --- */
-        body {
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            background: #000;
-            color: #f8fafc;
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center
-        }
+<!-- ========================================== -->
+<!-- 📊 DATA ANALYSIS DASHBOARD METADATA        -->
+<!-- ========================================== -->
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Data Analysis Dashboard</title>
 
-        .container {
-            background: #0a0a0a;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, .9);
-            max-width: 800px;
-            width: 100%;
-            border: 1px solid #1a1a1a
-        }
-
-        h1 {
-            color: #38bdf8;
-            text-align: center;
-            margin-top: 0;
-            font-size: 2.5rem
-        }
-
-        #btn {
-            background: linear-gradient(135deg, #0284c7, #2563eb);
-            color: #fff;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: 600;
-            display: block;
-            margin: 0 auto 30px;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, .4)
-        }
-
-        #btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 99, 235, .6)
-        }
-
-        #res {
-            margin-top: 30px;
-            display: none;
-            animation: f .5s ease-in;
-            text-align: center
-        }
-
-        h2,
-        h3 {
-            color: #cbd5e1;
-            text-align: center
-        }
-
-        h2 {
-            border-bottom: 2px solid #1a1a1a;
-            padding-bottom: 10px;
-            margin-top: 30px;
-            font-size: 1.5rem
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin-top: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, .5)
-        }
-
-        .plot {
-            background: #000;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            border: 1px solid #1a1a1a;
-            text-align: center
-        }
-
-        .plot h3 {
-            margin-top: 0;
-            color: #38bdf8;
-            font-size: 1.5rem
-        }
-
-        #load {
-            display: none;
-            text-align: center;
-            color: #38bdf8;
-            font-size: 1.2rem;
-            margin: 20px 0;
-            animation: p 1.5s infinite
-        }
-
-        .badge {
-            color: #fff;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: .8rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            display: inline-block
-        }
-
-        @keyframes f {
-            from {
-                opacity: 0;
-                transform: translateY(10px)
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0)
-            }
-        }
-
-        @keyframes p {
-
-            0%,
-            100% {
-                opacity: .6
-            }
-
-            50% {
-                opacity: 1
-            }
-        }
-    </style>
+<!-- === 1. CSS DESIGN SYSTEM (OLED Theme) === -->
+<style>
+body{font-family:'Inter','Segoe UI',sans-serif;background:#000;color:#f8fafc;margin:0;padding:40px 20px;display:flex;flex-direction:column;align-items:center}
+.container{background:#0a0a0a;padding:40px;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,.9);max-width:800px;width:100%;border:1px solid #1a1a1a}
+h1{color:#38bdf8;text-align:center;margin-top:0;font-size:2.5rem}
+#btn{background:linear-gradient(135deg,#0284c7,#2563eb);color:#fff;border:none;padding:14px 28px;border-radius:8px;cursor:pointer;font-size:18px;font-weight:600;display:block;margin:0 auto 30px;box-shadow:0 4px 15px rgba(37,99,235,.4)}
+#btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,99,235,.6)}
+#res{margin-top:30px;display:none;animation:f .5s ease-in;text-align:center}
+h2,h3{color:#cbd5e1;text-align:center}
+h2{border-bottom:2px solid #1a1a1a;padding-bottom:10px;margin-top:30px;font-size:1.5rem}
+img{max-width:100%;height:auto;border-radius:8px;margin-top:15px;box-shadow:0 4px 15px rgba(0,0,0,.5)}
+.plot{background:#000;padding:20px;border-radius:8px;margin-top:20px;border:1px solid #1a1a1a;text-align:center}
+.plot h3{margin-top:0;color:#38bdf8;font-size:1.5rem}
+#load{display:none;text-align:center;color:#38bdf8;font-size:1.2rem;margin:20px 0;animation:p 1.5s infinite}
+.badge{color:#fff;padding:4px 10px;border-radius:12px;font-size:.8rem;font-weight:bold;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;display:inline-block}
+@keyframes f{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes p{0%,100%{opacity:.6}50%{opacity:1}}
+</style>
 </head>
-
 <body>
-    <!-- --- MAIN UI LAYOUT --- -->
-    <div class="container">
-        <h1>📊 Data Analysis Hub</h1>
-        <p style="text-align:center;color:#777;margin-bottom:30px;font-size:1.1rem">A full-stack data dashboard built
-            with Flask and Python, exploring video game sales trends across various genres and platforms.</p>
-        <button id="btn" onclick="run()">Run Analysis Pipeline 🚀</button>
-        <div id="load">Processing Dataset & Generating Visualizations...</div>
-        <div id="res">
-            <h2>📈 Matplotlib Visualizations</h2>
-            <p style="color:#777;font-size:.95rem">Comprehensive data visualizations showing market trends and
-                distributions.</p>
-            <div id="g"></div>
-        </div>
-    </div>
-    <script>
-        /* --- ANALYTICS PIPELINE LOGIC --- */
-        async function run() {
-            const btn = document.getElementById('btn'), load = document.getElementById('load'), res = document.getElementById('res');
-            btn.style.display = 'none'; load.style.display = 'block'; res.style.display = 'none';
-            try {
-                const d = await (await fetch('/api/analyze')).json(), data = [{ c: '#ec4899', b: 'Line Plot', t: 'Global Sales Trend Over Time', k: 'line_plot' }, { c: '#f43f5e', b: 'Multi Line Plot', t: 'Regional Sales Over Time', k: 'line_styles_plot' }, { c: '#6366f1', b: 'Area Plot', t: 'Genre Market Share Over Time', k: 'area_plot' }, { c: '#38bdf8', b: 'Bar Plot', t: 'Global Sales by Genre', k: 'bar_plot' }, { c: '#14b8a6', b: 'Stacked Bar Plot', t: 'Regional Sales by Top Genres', k: 'stacked_bar_plot' }, { c: '#f59e0b', b: 'Histogram', t: 'Distribution of Games by Release Year', k: 'histogram_plot' }, { c: '#06b6d4', b: 'Scatter Plot', t: 'NA vs EU Sales Correlation', k: 'scatter_plot' }, { c: '#8b5cf6', b: 'Box Plot', t: 'Sales Distribution for Top Genres', k: 'box_plot' }, { c: '#ef4444', b: 'Hexbin Plot', t: 'NA vs EU Sales Density', k: 'hexbin_plot' }, { c: '#10b981', b: 'KDE Plot', t: 'Global Sales Distribution (Log Scale KDE)', k: 'kde_plot' }];
-                document.getElementById('g').innerHTML = data.map(p => d.plots[p.k] ? `<div class="plot"><span class="badge" style="background:${p.c}">${p.b}</span><h3>${p.t}</h3><img src="data:image/png;base64,${d.plots[p.k]}"></div>` : '').join('');
-                load.style.display = 'none'; res.style.display = 'block'; btn.textContent = 'Re-Run Analysis Pipeline 🚀'; btn.style.display = 'block'; btn.style.margin = '40px auto 0';
-            } catch (e) { alert('Analysis failed. Is the Flask backend running?'); btn.style.display = 'block'; load.style.display = 'none'; }
-        }
-    </script>
-</body>
 
+<!-- === 2. MAIN APPLICATION UI === -->
+<div class="container">
+<h1>📊 Data Analysis Hub</h1><p style="text-align:center;color:#777;margin-bottom:30px;font-size:1.1rem">A full-stack data dashboard built with Flask and Python, exploring video game sales trends across various genres and platforms.</p>
+<button id="btn" onclick="run()">Run Analysis Pipeline 🚀</button><div id="load">Processing Dataset & Generating Visualizations...</div>
+<div id="res"><h2>📈 Matplotlib Visualizations</h2><p style="color:#777;font-size:.95rem">Comprehensive data visualizations showing market trends and distributions.</p><div id="g"></div></div>
+</div>
+
+<!-- === 3. JAVASCRIPT PIPELINE & CLIENT LOGIC === -->
+<script>
+async function run() {
+    const btn=document.getElementById('btn'), load=document.getElementById('load'), res=document.getElementById('res');
+    btn.style.display='none'; load.style.display='block'; res.style.display='none';
+    try {
+        const d = await (await fetch('/api/analyze')).json(), data = [
+            {c:'#ec4899',b:'Line Plot',t:'Global Sales Trend Over Time',k:'line_plot'},{c:'#f43f5e',b:'Multi Line Plot',t:'Regional Sales Over Time',k:'line_styles_plot'},
+            {c:'#6366f1',b:'Area Plot',t:'Genre Market Share Over Time',k:'area_plot'},{c:'#38bdf8',b:'Bar Plot',t:'Global Sales by Genre',k:'bar_plot'},
+            {c:'#14b8a6',b:'Stacked Bar Plot',t:'Regional Sales by Top Genres',k:'stacked_bar_plot'},{c:'#f59e0b',b:'Histogram',t:'Distribution of Games by Release Year',k:'histogram_plot'},
+            {c:'#06b6d4',b:'Scatter Plot',t:'NA vs EU Sales Correlation',k:'scatter_plot'},{c:'#8b5cf6',b:'Box Plot',t:'Sales Distribution for Top Genres',k:'box_plot'},
+            {c:'#ef4444',b:'Hexbin Plot',t:'NA vs EU Sales Density',k:'hexbin_plot'},{c:'#10b981',b:'KDE Plot',t:'Global Sales Distribution (Log Scale KDE)',k:'kde_plot'}
+        ];
+        document.getElementById('g').innerHTML = data.map(p => d.plots[p.k] ? `<div class="plot"><span class="badge" style="background:${p.c}">${p.b}</span><h3>${p.t}</h3><img src="data:image/png;base64,${d.plots[p.k]}"></div>` : '').join('');
+        load.style.display='none'; res.style.display='block'; btn.textContent='Re-Run Analysis Pipeline 🚀'; btn.style.display='block'; btn.style.margin='40px auto 0';
+    } catch(e) { alert('Analysis failed. Is the Flask backend running?'); btn.style.display='block'; load.style.display='none'; }
+}
+</script>
+</body>
 </html>
