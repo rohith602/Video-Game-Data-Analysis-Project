@@ -1,13 +1,17 @@
-# ==========================================
-# 📊 VIDEO GAME SALES DATA ANALYSIS API
-# Stack: Flask, Pandas, Matplotlib, SciPy
-# ==========================================
-
+import os
 from flask import Flask, jsonify
 import pandas as pd, io, base64, numpy as np; import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
 
-# --- 1. CORE THEME (OLED Dark Mode DataViz) ---
+# --- 1. CORE THEME & GLOBAL DATA ---
 plt.rcParams.update({'figure.facecolor':'#000000','axes.facecolor':'#000000','axes.edgecolor':'#444444','axes.labelcolor':'#ffffff','text.color':'#ffffff','xtick.color':'#cccccc','ytick.color':'#cccccc','grid.color':'#333333','legend.facecolor':'#111111','legend.edgecolor':'#333333','legend.labelcolor':'#ffffff'})
+
+# Load and clean primary dataset GLOBALLY to optimize Render memory
+c_cols = ['Year','NA_Sales','EU_Sales','JP_Sales','Other_Sales','Global_Sales']
+df = pd.read_csv('vgsales.csv')
+df[c_cols] = df[c_cols].apply(pd.to_numeric, errors='coerce')
+t_df = df.dropna(subset=['Year'])[lambda x: x['Year'] <= 2016]
+r_cols = ['NA_Sales','EU_Sales','JP_Sales','Other_Sales']
+
 app = Flask(__name__, static_folder='.', static_url_path='')
 
 # --- 2. FRONTEND ROUTING ---
@@ -17,15 +21,12 @@ def index(): return app.send_static_file('index.html')
 # --- 3. DATA PROCESSING PIPELINE ---
 @app.route('/api/analyze')
 def analyze():
-    # Load and clean primary dataset headers
-    df, p, c_cols = pd.read_csv('vgsales.csv'), {}, ['Year','NA_Sales','EU_Sales','JP_Sales','Other_Sales','Global_Sales']
-    df[c_cols], r = df[c_cols].apply(pd.to_numeric, errors='coerce'), ['NA_Sales','EU_Sales','JP_Sales','Other_Sales']
-    t_df = df.dropna(subset=['Year'])[lambda x: x['Year'] <= 2016]
+    p = {}
 
     # DRY Wrapper Interface for Rendering Charts to Memory
     def f(n, t, x, y, g='both'):
         plt.title(t, fontsize=14, pad=15); plt.xlabel(x); plt.ylabel(y); plt.grid(True, ls='--', alpha=0.3, axis=g)
-        b = io.BytesIO(); plt.tight_layout(); plt.savefig(b, format='png', facecolor='#000000'); plt.close(); p[n] = base64.b64encode(b.getvalue()).decode()
+        b = io.BytesIO(); plt.tight_layout(); plt.savefig(b, format='png', facecolor='#000000'); plt.close('all'); p[n] = base64.b64encode(b.getvalue()).decode()
 
     # --- 4. DATA VISUALIZATION GENERATORS ---
     
@@ -33,7 +34,7 @@ def analyze():
     plt.figure(figsize=(10,6)); t_df.groupby('Year')['Global_Sales'].sum().plot(marker='o', color='#ec4899', lw=2); f('line_plot', 'Global Sales Trend Over Time (Line Plot)', 'Year', 'Global Sales (Millions)')
     
     # 2. Multi Line Plot (Regional Sales Over Time)
-    plt.figure(figsize=(10,6)); [t_df.groupby('Year')[c_r].sum().plot(ls=s, c=c, lw=2.5, label=l) for c_r, s, c, l in zip(r, ['-','--','-.', ':'], ['#ef4444','#3b82f6','#10b981','#f59e0b'], ['North America','Europe','Japan','Other'])]
+    plt.figure(figsize=(10,6)); [t_df.groupby('Year')[c_r].sum().plot(ls=s, c=c, lw=2.5, label=l) for c_r, s, c, l in zip(r_cols, ['-','--','-.', ':'], ['#ef4444','#3b82f6','#10b981','#f59e0b'], ['North America','Europe','Japan','Other'])]
     plt.legend(fontsize=11); f('line_styles_plot', 'Regional Sales Over Time (Multi Line Plot)', 'Year', 'Sales (Millions)')
     
     # 3. Area Plot (Genre Market Share Over Time)
@@ -43,7 +44,7 @@ def analyze():
     gs = df.groupby('Genre')['Global_Sales'].sum().sort_values(ascending=False); plt.figure(figsize=(10,6)); gs.plot(kind='bar', color='#38bdf8', edgecolor='#222222'); plt.xticks(rotation=45, ha='right'); f('bar_plot', 'Global Sales by Genre (Bar Plot)', 'Genre', 'Global Sales (Millions)', 'y')
     
     # 5. Stacked Bar Plot (Regional Sales by Top Genres)
-    t5 = gs.nlargest(5).index; plt.figure(figsize=(10,6)); df[df['Genre'].isin(t5)].groupby('Genre')[r].sum().plot(kind='bar', stacked=True, colormap='Set2', ax=plt.gca(), edgecolor='#222222'); plt.legend(['NA','EU','JP','Other'], title='Region'); plt.xticks(rotation=0); f('stacked_bar_plot', 'Regional Sales by Top Genres (Stacked Bar Plot)', 'Genre', 'Sales (Millions)', 'y')
+    t5 = gs.nlargest(5).index; plt.figure(figsize=(10,6)); df[df['Genre'].isin(t5)].groupby('Genre')[r_cols].sum().plot(kind='bar', stacked=True, colormap='Set2', ax=plt.gca(), edgecolor='#222222'); plt.legend(['NA','EU','JP','Other'], title='Region'); plt.xticks(rotation=0); f('stacked_bar_plot', 'Regional Sales by Top Genres (Stacked Bar Plot)', 'Genre', 'Sales (Millions)', 'y')
     
     # 6. Histogram (Distribution of Games by Release Year)
     plt.figure(figsize=(10,6)); plt.hist(df['Year'].dropna(), bins=20, color='#f59e0b', edgecolor='#222222', alpha=0.85); f('histogram_plot', 'Distribution of Games by Release Year (Histogram)', 'Release Year', 'Number of Games')
@@ -63,5 +64,5 @@ def analyze():
     # --- 5. API RESPONSE ---
     return jsonify({'plots': p})
 
-    import os
+if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
